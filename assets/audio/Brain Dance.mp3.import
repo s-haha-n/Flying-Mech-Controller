@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dko6nl77hb047"
+path="res://.godot/imported/Brain Dance.mp3-50585118c783f539c2a436497537465c.mp3str"
+
+[deps]
+
+source_file="res://assets/audio/Brain Dance.mp3"
+dest_files=["res://.godot/imported/Brain Dance.mp3-50585118c783f539c2a436497537465c.mp3str"]
+
+[params]
+
+loop=true
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

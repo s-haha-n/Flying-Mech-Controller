@@ -1,0 +1,79 @@
+[gd_scene format=3 uid="uid://b6xvhnexkybr4"]
+
+[ext_resource type="PackedScene" uid="uid://nfhi3ikyu1r7" path="res://scenes/player.tscn" id="1_o5qli"]
+[ext_resource type="PackedScene" uid="uid://bbh6tnompxrog" path="res://scenes/targetsphere.tscn" id="2_sugp2"]
+[ext_resource type="Script" uid="uid://b26nqygptw36j" path="res://scripts/targetspawner.gd" id="3_jyhfs"]
+[ext_resource type="PackedScene" uid="uid://xagits48ds3" path="res://assets/meshes/blender_environtment_testing/blender_level.blend" id="4_jyhfs"]
+[ext_resource type="AudioStream" uid="uid://dko6nl77hb047" path="res://assets/audio/Brain Dance.mp3" id="5_tbgi4"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_o5qli"]
+sky_top_color = Color(0.00847327, 0.031420548, 0.06793731, 1)
+sky_horizon_color = Color(0.16600506, 0.14790002, 0.51, 1)
+sky_curve = 0.04459518
+ground_bottom_color = Color(0, 0.21761972, 0.33200535, 1)
+ground_horizon_color = Color(0.09703081, 0.356528, 0.50505924, 1)
+ground_curve = 0.023784105
+energy_multiplier = 0.85
+
+[sub_resource type="Sky" id="Sky_0wfyh"]
+sky_material = SubResource("ProceduralSkyMaterial_o5qli")
+
+[sub_resource type="Environment" id="Environment_sugp2"]
+background_mode = 2
+sky = SubResource("Sky_0wfyh")
+ssr_enabled = true
+ssao_enabled = true
+glow_enabled = true
+glow_normalized = true
+glow_intensity = 1.62
+glow_bloom = 0.06
+fog_enabled = true
+fog_mode = 1
+fog_light_color = Color(0.3421993, 0.45482725, 0.5085664, 1)
+fog_sun_scatter = 0.2
+fog_density = 1.0
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_0wfyh"]
+load_path = "res://.godot/imported/crosshair102.png-95527fd94a60ad14f0c9bd70cb14094e.ctex"
+
+[node name="Node3D" type="Node3D" unique_id=2043002970]
+
+[node name="Player" parent="." unique_id=1211124716 groups=["player"] instance=ExtResource("1_o5qli")]
+collision_layer = 2
+collision_mask = 3
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=328742630]
+transform = Transform3D(0.028971603, 0.9992629, 0.025184672, -0.656059, -2.867725e-08, 0.75470966, 0.75415325, -0.038387775, 0.6555755, 0, 10, 0)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1298608901]
+environment = SubResource("Environment_sugp2")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1660672484]
+
+[node name="CenterContainer" type="CenterContainer" parent="CanvasLayer" unique_id=471372744]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/CenterContainer" unique_id=1270816868]
+modulate = Color(0.62683845, 1.9118416, 1.8047578, 0.50980395)
+layout_mode = 2
+texture = SubResource("CompressedTexture2D_0wfyh")
+flip_v = true
+
+[node name="TargetSpawner" type="Node3D" parent="." unique_id=1191978725]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 16.309082, 38.53009)
+script = ExtResource("3_jyhfs")
+target_scene = ExtResource("2_sugp2")
+count = 50
+radius = 20.0
+
+[node name="blender_level" parent="." unique_id=545884163 instance=ExtResource("4_jyhfs")]
+
+[node name="BackgroundMusic" type="Node3D" parent="." unique_id=686892467]
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="BackgroundMusic" unique_id=933677143]
+stream = ExtResource("5_tbgi4")
+autoplay = true

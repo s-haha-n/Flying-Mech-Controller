@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://bphfnc4a7etoj"]
+
+[ext_resource type="Script" uid="uid://bkkbpwqfqgpn3" path="res://scenes/VFX/explosionclean.gd" id="1_d6u0f"]
+
+[sub_resource type="Curve" id="Curve_d6u0f"]
+_limits = [0.0, 8.59, 0.0, 1.0]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1e-05, 1), 0.0, 0.0, 0, 0, Vector2(2e-05, 8.59), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CurveTexture_4aphf"]
+curve = SubResource("Curve_d6u0f")
+
+[sub_resource type="Curve" id="Curve_nuhn3"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.83744854, 0.6818181), -0.83813745, -0.83813745, 0, 0, Vector2(0.99999, 0), -2.454769, -2.454769, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CurveTexture_d6u0f"]
+curve = SubResource("Curve_nuhn3")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_4aphf"]
+spread = 180.0
+initial_velocity_max = 2.0
+gravity = Vector3(0, 0.6, 0)
+scale_min = 0.5
+scale_curve = SubResource("CurveTexture_d6u0f")
+emission_curve = SubResource("CurveTexture_4aphf")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6wth4"]
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.9909851, 0, 0.2531638, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_h18ey"]
+material = SubResource("StandardMaterial3D_6wth4")
+
+[node name="Node3D" type="Node3D" unique_id=1550906876]
+script = ExtResource("1_d6u0f")
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=755090381]
+emitting = false
+amount = 20
+lifetime = 2.0
+one_shot = true
+speed_scale = 3.5
+explosiveness = 0.7
+process_material = SubResource("ParticleProcessMaterial_4aphf")
+draw_pass_1 = SubResource("SphereMesh_h18ey")

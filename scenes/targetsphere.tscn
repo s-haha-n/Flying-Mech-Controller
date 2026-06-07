@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://bbh6tnompxrog"]
+
+[ext_resource type="Script" uid="uid://b04txub40bidv" path="res://scenes/targetmovement.gd" id="1_tlnny"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_sugp2"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_jyhfs"]
+
+[node name="TargetDummy" type="RigidBody3D" unique_id=1778762445 groups=["target"]]
+gravity_scale = 0.1
+script = ExtResource("1_tlnny")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1111012370 groups=["target"]]
+shape = SubResource("SphereShape3D_sugp2")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=173680808]
+mesh = SubResource("SphereMesh_jyhfs")
