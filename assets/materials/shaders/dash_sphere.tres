@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://rq6fcpgo20ov"]
+
+[ext_resource type="Shader" uid="uid://ls4s37kvntge" path="res://assets/materials/shaders/dashsphere.gdshader" id="1_e46vn"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_e46vn")
+shader_parameter/alpha = 0.30000001425
+shader_parameter/rim_color = Color(0.54510003, 0.728775, 0.79, 1)
+shader_parameter/power = 1.335
+shader_parameter/rim = 11.325

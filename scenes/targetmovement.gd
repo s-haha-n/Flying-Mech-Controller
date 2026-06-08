@@ -15,6 +15,10 @@ func _ready() -> void:
 	# Random offset so each dummy samples noise at a different phase
 	_noise_offset = randf() * 1000.0
 	_player = get_tree().get_first_node_in_group("player")
+	
+	# Access AimTarget from the player reference
+	if _player:
+		_player = _player.get_node("CameraPivot/SpringArm3D/Camera3D/AimTarget")
 	# Let RigidBody handle movement, disable gravity so they float
 	gravity_scale = 0.0
 	linear_damp = 2.0

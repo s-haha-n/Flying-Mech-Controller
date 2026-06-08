@@ -9,6 +9,8 @@
 [node name="TargetDummy" type="RigidBody3D" unique_id=1778762445 groups=["target"]]
 gravity_scale = 0.1
 script = ExtResource("1_tlnny")
+move_speed = 17.0
+home_force = 100.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1111012370 groups=["target"]]
 shape = SubResource("SphereShape3D_sugp2")
