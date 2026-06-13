@@ -1,6 +1,7 @@
 extends CharacterBody3D
 
-@export var bullet_scene: PackedScene = preload("res://scenes/bullet.tscn")
+@onready var _health: Node = $HealthComponent
+@export var bullet_scene: PackedScene = preload("res://scenes/projectiles/bullet.tscn")
 @onready var _muzzle: Marker3D = $HexFrame/Armature/Skeleton3D/BoneAttachment3D/Muzzle # Adjust path as needed
 @onready var _muzzle_flash: GPUParticles3D = $HexFrame/Armature/Skeleton3D/BoneAttachment3D/Muzzle/MuzzleFlash # Adjust path as needed
 @onready var _shoot_timer: Timer = $ShootTimer
@@ -13,17 +14,22 @@ extends CharacterBody3D
 
 @export_group("Movement")
 @export var walk_speed := 8.0
-@export var move_speed := 7.0  
+@export var move_speed := 10.0  
 @export var dash_speed := 30.0
 @export var acceleration := 14.0
 @export var deceleration := 10.0
 @export var rotation_speed := 10.0
 @export var vertical_speed := 8.0
 
+@onready var lockon: Node = $LockOnController
+
 @export_group("Camera")
 @export_range(0.0, 1.0) var mouse_sensitivity := 0.25
 @export var tilt_upper_limit := PI * 0.45
 @export var tilt_lower_limit := -PI * 0.45
+var _smoothed_mouse := Vector2.ZERO
+@export var mouse_smooth_speed := 12.0  # tweak between 8–20
+
 
 var _camera_input_direction := Vector2.ZERO
 var _last_movement_direction := Vector3.BACK
@@ -31,6 +37,7 @@ var _last_movement_direction := Vector3.BACK
 @onready var _camera_pivot: Node3D = %CameraPivot
 @onready var _camera: Camera3D = %Camera3D
 @onready var _hex_frame: Node3D = $HexFrame
+@onready var DashSphere: Node3D = $HexFrame/DashSphere
 @onready var _anim_tree: AnimationTree = $HexFrame/AnimationTree
 const AIM_THRESHOLD := 0.85  # fire when arm is 85% raised
 
@@ -40,6 +47,10 @@ func _ready() -> void:
 	motion_mode = CharacterBody3D.MOTION_MODE_FLOATING
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	_one_shot_node = _anim_tree.tree_root.get_node("OneShot")
+		# Give LockOnController direct references so it doesn't use get_node paths
+	lockon.hex_frame = _hex_frame
+	lockon.camera_pivot = _camera_pivot
+	_health.died.connect(_on_died)
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
@@ -52,6 +63,10 @@ func _input(event: InputEvent) -> void:
 		await get_tree().create_timer(0.5).timeout
 		_slash_sound.pitch_scale = randf_range(0.95, 1.05)
 		_slash_sound.play()
+		
+	if event.is_action_pressed("lock_on"):
+		lockon.toggle_lock_on()
+
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
@@ -70,45 +85,41 @@ func _update_head_influence(delta: float) -> void:
 	var target_inf := smoothstep(-0.2, 0.4, dot)
 	
 	head_modifier.influence = lerp(head_modifier.influence, target_inf, 6.0 * delta)
+	
+func take_damage(amount: int) -> void:
+	_health.take_damage(amount)
+
+func _on_died() -> void:
+	# respawn, game over screen, etc.
+	get_tree().reload_current_scene()
+	pass
 
 func shoot() -> void:
 	var bullet = bullet_scene.instantiate()
-	# 1 Add bullet to the root scene (not the player) so it doesn't move with the player
 	get_tree().root.add_child(bullet)
-	
-	# 2 Set the bullet position to the muzzle
 	bullet.global_transform = _muzzle.global_transform
-	# Add the player's current velocity so the bullet doesn't lag behind
 	bullet.global_position += velocity * get_physics_process_delta_time()
-	
-	# Targeting: Aim the bullet toward the center of the screen
-	var cam = get_viewport().get_camera_3d()
-	var screen_center = get_viewport().size / 2
-	
-	var origin = cam.project_ray_origin(screen_center)
-	var end = origin + cam.project_ray_normal(screen_center) * 1000.0
-	
-	# Use a RayCast to see what the reticle is pointing at
-	var query = PhysicsRayQueryParameters3D.create(origin, end)
-	
-	# FIX 1: Only hit Layer 1 (Environment). This ignores Layer 2 (Player).
-	query.collision_mask = 1 
-	# FIX 2: Explicitly tell the ray to ignore the player's physics body
-	query.exclude = [self.get_rid()] 
-	
-	var result = get_world_3d().direct_space_state.intersect_ray(query)
-	
-	var target_pos = end
-	if not result.is_empty():
-		target_pos = result.position # Aim at the wall/enemy we hit
-	
-	# Make the bullet face that target point
+
+	var target_pos: Vector3
+	if lockon.lock_on_active and lockon.lock_target != null:
+		# Aim directly at the locked target's center
+		target_pos = lockon.lock_target.global_position
+	else:
+		# Original free-aim raycast
+		var cam = get_viewport().get_camera_3d()
+		var screen_center = get_viewport().size / 2
+		var origin = cam.project_ray_origin(screen_center)
+		var end = origin + cam.project_ray_normal(screen_center) * 1000.0
+		var query = PhysicsRayQueryParameters3D.create(origin, end)
+		query.collision_mask = 1
+		query.exclude = [self.get_rid()]
+		var result = get_world_3d().direct_space_state.intersect_ray(query)
+		target_pos = result.position if not result.is_empty() else end
+
 	bullet.look_at(target_pos)
-	
-	var spread_angle := 0.005  # radians, tune this (~2 degrees)
+	var spread_angle := 0.005
 	bullet.rotate_object_local(Vector3.UP, randf_range(-spread_angle, spread_angle))
 	bullet.rotate_object_local(Vector3.RIGHT, randf_range(-spread_angle, spread_angle))
-	
 	_shoot_sound.pitch_scale = randf_range(0.95, 1.05)
 	_shoot_sound.play()
 	
@@ -116,16 +127,26 @@ func _process(delta: float) -> void:
 	# FOV Stretching
 	var target_fov = 80.0
 	if Input.is_action_pressed("dash"):
-		target_fov = 105.0 # High speed stretch
+		target_fov = 90.0 # High speed stretch
 	
 	_camera.fov = lerp(_camera.fov, target_fov, 4.0 * delta)
 	
 func _physics_process(delta: float) -> void:
 	# --- Camera Rotation ---
-	_camera_pivot.rotation.x += _camera_input_direction.y * delta
-	_camera_pivot.rotation.x = clamp(_camera_pivot.rotation.x, tilt_lower_limit, tilt_upper_limit)
-	_camera_pivot.rotation.y -= _camera_input_direction.x * delta
+	#_camera_pivot.rotation.x += _camera_input_direction.y * delta
+	#_camera_pivot.rotation.x = clamp(_camera_pivot.rotation.x, tilt_lower_limit, tilt_upper_limit)
+	#_camera_pivot.rotation.y -= _camera_input_direction.x * delta
+	
+	# Smooth the mouse input
+	_smoothed_mouse = lerp(_smoothed_mouse, _camera_input_direction, mouse_smooth_speed * delta)
+
+	if not lockon.lock_on_active:
+		_camera_pivot.rotation.x += _smoothed_mouse.y * delta
+		_camera_pivot.rotation.x = clamp(_camera_pivot.rotation.x, tilt_lower_limit, tilt_upper_limit)
+		_camera_pivot.rotation.y -= _smoothed_mouse.x * delta
+
 	_camera_input_direction = Vector2.ZERO
+
 	_one_shot_node.filter_enabled = Input.is_action_pressed("dash")
 	# --- Input ---
 	var raw_input := Input.get_vector("move_left", "move_right", "move_up", "move_down")
@@ -135,7 +156,6 @@ func _physics_process(delta: float) -> void:
 	move_direction.y += Input.get_axis("move_descend", "move_ascend")
 
 	move_direction = move_direction.normalized() if move_direction.length() > 0.01 else Vector3.ZERO
-	
 	
 	# --- 2. Aiming Logic (New) ---
 	var is_shooting := Input.is_action_pressed("left_click")
@@ -169,13 +189,16 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
-	# --- Rotation ---
-	var flat_dir := Vector3(velocity.x, 0.0, velocity.z)
-	if flat_dir.length() > 0.2:
-		_last_movement_direction = flat_dir.normalized()
-	var target_angle := Vector3.BACK.signed_angle_to(_last_movement_direction, Vector3.UP)
-	_hex_frame.global_rotation.y = lerp_angle(_hex_frame.global_rotation.y, target_angle, rotation_speed * delta)
-	
+# --- Rotation --- (replace the existing block at the bottom)
+	if not lockon.lock_on_active:
+		var flat_dir := Vector3(velocity.x, 0.0, velocity.z)
+		if flat_dir.length() > 0.2:
+			_last_movement_direction = flat_dir.normalized()
+		var target_angle := Vector3.BACK.signed_angle_to(_last_movement_direction, Vector3.UP)
+		_hex_frame.global_rotation.y = lerp_angle(
+			_hex_frame.global_rotation.y, target_angle, rotation_speed * delta
+		)
+	# When locked on, LockOnController.update() handles hex_frame rotation instead
 	 # ZoE Camera Lean: Shift camera left/right based on horizontal input
 	#var target_h_offset = -raw_input.x * 0.5 # Lean the opposite way of movement
 	#_camera.h_offset = lerp(_camera.h_offset, target_h_offset, 5.0 * delta)
@@ -185,6 +208,8 @@ func _physics_process(delta: float) -> void:
 	
 	#_update_head_influence(delta)
 	_update_animation(delta)
+	lockon.update(delta)
+
 	
 func _update_animation(delta: float) -> void:
 	var horizontal_speed := Vector3(velocity.x, 0.0, velocity.z).length()
@@ -193,9 +218,15 @@ func _update_animation(delta: float) -> void:
 	var target_state: float = 0.0
 	if horizontal_speed > 0.5:
 		if Input.is_action_pressed("dash"):
+			DashSphere.trigger(velocity)
+			#DashTrailParticles.emitting = true
 			target_state = 2.0 # Dash
 		else:
 			target_state = 1.0 # Run (sforward)
+	
+	if Input.is_action_just_released("dash"):
+		DashSphere.end_dash()
+
 	
 	# Lerp the movement blend value for smooth transitions
 	var current_blend = _anim_tree.get("parameters/MoveType/blend_position")

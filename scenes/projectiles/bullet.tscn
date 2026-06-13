@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://6jl0t8dhfon7"]
 
-[ext_resource type="Script" uid="uid://dgcmsx5ivued4" path="res://scenes/bullet.gd" id="1_mkf8s"]
+[ext_resource type="Script" uid="uid://dgcmsx5ivued4" path="res://scenes/projectiles/bullet.gd" id="1_mkf8s"]
 [ext_resource type="PackedScene" uid="uid://bphfnc4a7etoj" path="res://scenes/VFX/Explosion1.tscn" id="2_l5glv"]
 [ext_resource type="Material" uid="uid://bs654ygb0ys8l" path="res://assets/materials/bullet.tres" id="2_y25gk"]
 

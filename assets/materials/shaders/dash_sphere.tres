@@ -5,7 +5,14 @@
 [resource]
 render_priority = 0
 shader = ExtResource("1_e46vn")
-shader_parameter/alpha = 0.30000001425
-shader_parameter/rim_color = Color(0.54510003, 0.728775, 0.79, 1)
-shader_parameter/power = 1.335
-shader_parameter/rim = 11.325
+shader_parameter/color = Color(0.8920908, 1.2636365, 1.3462359, 1)
+shader_parameter/brightness = 57.1090027126775
+shader_parameter/band_offset = -0.2809999658475
+shader_parameter/band_sharpness = 1.5000000679901202
+shader_parameter/edge_softness = 32.00000151674012
+shader_parameter/tail_direction = Vector3(0, 0, -1)
+shader_parameter/tail_length = 0.50000002375
+shader_parameter/tail_fade_start = 0.0
+shader_parameter/tail_fade_end = 0.8250000391875
+shader_parameter/flutter_amount = 0.0030000001425
+shader_parameter/flutter_speed = 90.000004275

@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://bnbtpasres36d"]
+
+[ext_resource type="Script" uid="uid://c2qt6cvpisd7n" path="res://scenes/EnemyController/EnemyController.gd" id="1_otrr5"]
+[ext_resource type="PackedScene" uid="uid://b5mwmbkrfeuoq" path="res://scenes/EnemyController/EnemyProjectile.tscn" id="2_kjhje"]
+[ext_resource type="PackedScene" uid="uid://c6boli3o3es0u" path="res://assets/meshes/basic_enemy_fig1.glb" id="3_a6nwe"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_j5aq7"]
+radius = 0.7227053
+
+[sub_resource type="PrismMesh" id="PrismMesh_ga0m3"]
+
+[node name="EnemyController" type="CharacterBody3D" unique_id=358576565]
+script = ExtResource("1_otrr5")
+projectile_scene = ExtResource("2_kjhje")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=975687800]
+shape = SubResource("SphereShape3D_j5aq7")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CollisionShape3D" unique_id=1847018151]
+visible = false
+mesh = SubResource("PrismMesh_ga0m3")
+
+[node name="ShootTimer" type="Timer" parent="." unique_id=746746216]
+
+[node name="basic_enemy_fig1" parent="." unique_id=835860435 instance=ExtResource("3_a6nwe")]
+transform = Transform3D(0.605, 0, 0, 0, 0.605, 0, 0, 0, 0.605, 0, -1.2040122, -0.021403313)
+
+[node name="Label3D" type="Label3D" parent="." unique_id=497175049]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5044808, 0)
+modulate = Color(1, 0, 0, 0.64705884)
+outline_modulate = Color(0, 0, 1, 0.23137255)
+text = "Test"
+font_size = 188

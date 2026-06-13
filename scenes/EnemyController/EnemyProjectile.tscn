@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://b5mwmbkrfeuoq"]
+
+[ext_resource type="Script" uid="uid://dvl3uumepgav5" path="res://scenes/EnemyController/EnemyProjectile.gd" id="1_e8ik0"]
+[ext_resource type="Material" uid="uid://cpwi84rrafh4f" path="res://assets/materials/hazard_mat.tres" id="2_j7vux"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_eb6dy"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_trceg"]
+
+[node name="enemyProjectile" type="RigidBody3D" unique_id=341380805]
+collision_layer = 4
+collision_mask = 2
+contact_monitor = true
+max_contacts_reported = 1
+script = ExtResource("1_e8ik0")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=33820905]
+shape = SubResource("SphereShape3D_eb6dy")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CollisionShape3D" unique_id=1788653633]
+mesh = SubResource("SphereMesh_trceg")
+surface_material_override/0 = ExtResource("2_j7vux")

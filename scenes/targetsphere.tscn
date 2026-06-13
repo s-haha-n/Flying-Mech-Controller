@@ -4,13 +4,16 @@
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_sugp2"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tlnny"]
+
 [sub_resource type="SphereMesh" id="SphereMesh_jyhfs"]
+material = SubResource("StandardMaterial3D_tlnny")
 
 [node name="TargetDummy" type="RigidBody3D" unique_id=1778762445 groups=["target"]]
+transform = Transform3D(2.73, 0, 0, 0, 2.73, 0, 0, 0, 2.73, 0, 0, 0)
 gravity_scale = 0.1
 script = ExtResource("1_tlnny")
-move_speed = 17.0
-home_force = 100.0
+move_speed = 5.875
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1111012370 groups=["target"]]
 shape = SubResource("SphereShape3D_sugp2")

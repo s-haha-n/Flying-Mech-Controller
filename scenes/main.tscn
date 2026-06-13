@@ -1,11 +1,14 @@
 [gd_scene format=3 uid="uid://b6xvhnexkybr4"]
 
 [ext_resource type="PackedScene" uid="uid://nfhi3ikyu1r7" path="res://scenes/player/player.tscn" id="1_o5qli"]
-[ext_resource type="PackedScene" uid="uid://bbh6tnompxrog" path="res://scenes/targetsphere.tscn" id="2_sugp2"]
-[ext_resource type="Script" uid="uid://b26nqygptw36j" path="res://scripts/targetspawner.gd" id="3_jyhfs"]
+[ext_resource type="Script" uid="uid://b1owcgybj40xp" path="res://scenes/HUD.gd" id="2_85g3d"]
+[ext_resource type="Texture2D" uid="uid://caendscmbt7t8" path="res://assets/images/healthbar_frame.png" id="2_o6xl0"]
 [ext_resource type="PackedScene" uid="uid://xagits48ds3" path="res://assets/meshes/blender_environtment_testing/blender_level.blend" id="4_jyhfs"]
 [ext_resource type="Script" uid="uid://ciakhh2p5c3uc" path="res://assets/meshes/blender_environtment_testing/obstaclecourse.gd" id="5_tefeu"]
 [ext_resource type="AudioStream" uid="uid://dko6nl77hb047" path="res://assets/audio/Brain Dance.mp3" id="6_tefeu"]
+[ext_resource type="Script" uid="uid://bifdq3hwlvg4a" path="res://scenes/HazardObject.gd" id="8_tipki"]
+[ext_resource type="Material" uid="uid://cpwi84rrafh4f" path="res://assets/materials/hazard_mat.tres" id="10_choun"]
+[ext_resource type="PackedScene" uid="uid://bnbtpasres36d" path="res://scenes/EnemyController/EnemyController.tscn" id="11_ya4ey"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_o5qli"]
 sky_top_color = Color(0.00847327, 0.031420548, 0.06793731, 1)
@@ -30,12 +33,22 @@ glow_intensity = 1.62
 glow_bloom = 0.06
 fog_enabled = true
 fog_mode = 1
-fog_light_color = Color(0.3421993, 0.45482725, 0.5085664, 1)
+fog_light_color = Color(0.23040101, 0.31830698, 0.3605861, 1)
 fog_sun_scatter = 0.2
 fog_density = 1.0
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_0wfyh"]
 load_path = "res://.godot/imported/crosshair102.png-95527fd94a60ad14f0c9bd70cb14094e.ctex"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o6xl0"]
+bg_color = Color(0.60038817, 0.60038817, 0.60038817, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tipki"]
+bg_color = Color(0.60038817, 0.9128102, 0.60038817, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_85g3d"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_choun"]
 
 [node name="Node3D" type="Node3D" unique_id=2043002970]
 
@@ -50,6 +63,7 @@ transform = Transform3D(0.028971603, 0.9992629, 0.025184672, -0.656059, -2.86772
 environment = SubResource("Environment_sugp2")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1660672484]
+script = ExtResource("2_85g3d")
 
 [node name="CenterContainer" type="CenterContainer" parent="CanvasLayer" unique_id=471372744]
 anchors_preset = 15
@@ -64,12 +78,31 @@ layout_mode = 2
 texture = SubResource("CompressedTexture2D_0wfyh")
 flip_v = true
 
-[node name="TargetSpawner" type="Node3D" parent="." unique_id=1191978725]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 16.309082, 38.53009)
-script = ExtResource("3_jyhfs")
-target_scene = ExtResource("2_sugp2")
-count = 42
-radius = 20.0
+[node name="HealthBarFrame" type="TextureRect" parent="CanvasLayer" unique_id=510068263]
+custom_minimum_size = Vector2(500, 275)
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 533.0
+offset_top = -184.0
+offset_right = 1033.0
+offset_bottom = 94.339966
+grow_vertical = 0
+scale = Vector2(0.735, 0.735)
+texture = ExtResource("2_o6xl0")
+expand_mode = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/HealthBarFrame" unique_id=1590821482]
+z_index = -1
+layout_mode = 0
+offset_left = 194.55782
+offset_top = 103.86386
+offset_right = 405.44214
+offset_bottom = 126.86386
+theme_override_colors/font_color = Color(0.9499975, 0.9499975, 0.9499975, 0)
+theme_override_styles/background = SubResource("StyleBoxFlat_o6xl0")
+theme_override_styles/fill = SubResource("StyleBoxFlat_tipki")
+value = 100.0
 
 [node name="blender_level" parent="." unique_id=545884163 instance=ExtResource("4_jyhfs")]
 script = ExtResource("5_tefeu")
@@ -78,3 +111,40 @@ script = ExtResource("5_tefeu")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="BackgroundMusic" unique_id=933677143]
 stream = ExtResource("6_tefeu")
+autoplay = true
+
+[node name="hazard" type="Area3D" parent="." unique_id=23529314]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.556386, 11.400434)
+visible = false
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("8_tipki")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="hazard" unique_id=1416808019]
+material_override = ExtResource("10_choun")
+mesh = SubResource("BoxMesh_85g3d")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="hazard" unique_id=1835926144]
+shape = SubResource("BoxShape3D_choun")
+
+[node name="EnemyController" parent="." unique_id=358576565 instance=ExtResource("11_ya4ey")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.144909, 14.55999, 55.35285)
+aim_height_offset = 3.0
+move_speed = 8.0
+rotation_speed = 5.0
+shots_per_burst = 6
+burst_interval = 0.07
+shoot_cooldown = 2.25
+projectile_speed = 50.0
+max_health = 200
+
+[node name="EnemyController2" parent="." unique_id=2091513248 instance=ExtResource("11_ya4ey")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.656305, 14.55999, 55.35285)
+aim_height_offset = 3.0
+move_speed = 8.0
+rotation_speed = 5.0
+shots_per_burst = 6
+burst_interval = 0.07
+shoot_cooldown = 2.25
+projectile_speed = 50.0
+max_health = 200

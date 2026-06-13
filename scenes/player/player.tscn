@@ -2,9 +2,12 @@
 
 [ext_resource type="Script" uid="uid://b6m7v8al42ubj" path="res://scenes/player/player.gd" id="1_g2els"]
 [ext_resource type="Material" uid="uid://bs654ygb0ys8l" path="res://assets/materials/bullet.tres" id="2_g2els"]
-[ext_resource type="AudioStream" uid="uid://dmf4dknvijse6" path="res://assets/audio/shot2.wav" id="3_qhqgy"]
+[ext_resource type="AudioStream" uid="uid://df74tbo843sc7" path="res://assets/audio/shot1.wav" id="3_p47bc"]
 [ext_resource type="AudioStream" uid="uid://336ypyojjnyw" path="res://assets/audio/dexedsaka.wav" id="4_lvxji"]
 [ext_resource type="Material" uid="uid://rq6fcpgo20ov" path="res://assets/materials/shaders/dash_sphere.tres" id="5_p47bc"]
+[ext_resource type="Script" uid="uid://drv2wqyq62hxu" path="res://scenes/player/DashSphere.gd" id="6_75vfm"]
+[ext_resource type="Script" uid="uid://dgpfu7nfexdid" path="res://scenes/player/LockOnController.gd" id="7_0owmy"]
+[ext_resource type="Script" uid="uid://dvtea7cuulw04" path="res://scenes/player/HealthComponent.gd" id="8_qek5x"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0wfyh"]
 height = 4.465332
@@ -141,11 +144,6 @@ scale_curve = SubResource("CurveTexture_dqkch")
 
 [sub_resource type="SphereMesh" id="SphereMesh_tuyoq"]
 material = ExtResource("2_g2els")
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_tefeu"]
-
-[sub_resource type="SphereMesh" id="SphereMesh_75vfm"]
-material = SubResource("ShaderMaterial_tefeu")
 
 [sub_resource type="Animation" id="Animation_3vyb7"]
 resource_name = "Aim_LeftArm"
@@ -1194,7 +1192,6 @@ fadein_time = 0.1
 fadeout_time = 0.1
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_dqkch"]
-graph_offset = Vector2(158.93628, 75.27614)
 nodes/output/position = Vector2(1060, 120)
 nodes/MoveType/node = SubResource("AnimationNodeBlendSpace1D_smehm")
 nodes/MoveType/position = Vector2(580, 180)
@@ -1203,6 +1200,42 @@ nodes/OneShot/position = Vector2(860, 280)
 "nodes/Animation 4/node" = SubResource("AnimationNodeAnimation_qhqgy")
 "nodes/Animation 4/position" = Vector2(593.62134, 391.0447)
 node_connections = [&"output", 0, &"OneShot", &"OneShot", 0, &"MoveType", &"OneShot", 1, &"Animation 4"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_75vfm"]
+lightmap_size_hint = Vector2i(17, 9)
+
+[sub_resource type="Curve" id="Curve_75vfm"]
+_data = [Vector2(0, 0), 0.0, 11.769231, 0, 0, Vector2(0.1791444, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.4074073, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_0owmy"]
+curve = SubResource("Curve_75vfm")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_qek5x"]
+emission_shape_scale = Vector3(0.35, 0.35, 0.35)
+emission_shape = 1
+emission_sphere_radius = 1.0
+angle_min = 1.0728835e-05
+angle_max = 1.0728835e-05
+direction = Vector3(0, 0, -1)
+spread = 0.0
+initial_velocity_min = 1.0
+initial_velocity_max = 3.0
+gravity = Vector3(0, 0, 0)
+radial_accel_min = -2.2351742e-06
+radial_accel_max = -2.2351742e-06
+scale_min = 0.29999998
+color = Color(0.45882353, 0.58431375, 0.6156863, 1)
+alpha_curve = SubResource("CurveTexture_0owmy")
+
+[sub_resource type="ORMMaterial3D" id="ORMMaterial3D_qek5x"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+
+[sub_resource type="BoxMesh" id="BoxMesh_5gtgg"]
+material = SubResource("ORMMaterial3D_qek5x")
+size = Vector3(0.005, 0.005, 0.1)
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_3vyb7"]
 
@@ -1345,7 +1378,7 @@ process_material = SubResource("ParticleProcessMaterial_qlg0r")
 draw_pass_1 = SubResource("SphereMesh_tuyoq")
 
 [node name="ShootSound" type="AudioStreamPlayer3D" parent="HexFrame/Armature/Skeleton3D/BoneAttachment3D/Muzzle" unique_id=391832300]
-stream = ExtResource("3_qhqgy")
+stream = ExtResource("3_p47bc")
 volume_db = -5.238
 max_db = -2.651
 max_polyphony = 7
@@ -1360,11 +1393,6 @@ max_polyphony = 7
 transform = Transform3D(1, 2.842171e-14, 4.7683716e-07, 2.3983594e-07, 0.8643023, -0.50297236, -4.121315e-07, 0.5029725, 0.8643023, 1.9834293e-15, 7.0546193, -0.25454834)
 bone_name = "spine3"
 bone_idx = 2
-
-[node name="DashSphere" type="MeshInstance3D" parent="HexFrame/Armature/Skeleton3D/SpineAttachment" unique_id=1305718775]
-transform = Transform3D(10.765, 2.5818335e-06, -4.4365966e-06, 3.4949956e-13, 9.304215, 5.4144998, 5.133152e-06, -5.414499, 9.304215, -5.509263e-07, -1.9853871, 1.1553764)
-material_override = ExtResource("5_p47bc")
-mesh = SubResource("SphereMesh_75vfm")
 
 [node name="UpperArmAim" type="LookAtModifier3D" parent="HexFrame/Armature/Skeleton3D" unique_id=1941369266]
 target_node = NodePath("../../../../CameraPivot/SpringArm3D/Camera3D/AimTarget")
@@ -1396,6 +1424,7 @@ secondary_limit_angle = 5.0033355
 secondary_damp_threshold = 1.0
 
 [node name="HeadAim" type="LookAtModifier3D" parent="HexFrame/Armature/Skeleton3D" unique_id=43369371]
+active = false
 target_node = NodePath("../../../../CameraPivot/SpringArm3D/Camera3D/AimTarget")
 bone_name = "head"
 bone = 5
@@ -1421,9 +1450,31 @@ parameters/OneShot/active = false
 parameters/OneShot/internal_active = false
 parameters/OneShot/request = 0
 
+[node name="DashSphere" type="MeshInstance3D" parent="HexFrame" unique_id=1305718775]
+transform = Transform3D(8.875, -7.391727e-13, 7.1435316e-13, 7.391727e-13, 8.875, -1.9832108e-26, -7.391727e-13, 8.208469e-26, 8.577, 1.6581166e-14, 6.2571993, 0.4926051)
+material_override = ExtResource("5_p47bc")
+mesh = SubResource("SphereMesh_75vfm")
+surface_material_override/0 = ExtResource("5_p47bc")
+script = ExtResource("6_75vfm")
+max_scale = 12.0
+scale_start = 8.0
+sharpness_start = 1.5
+fade_in_time = 0.25
+fade_out_time = 0.25
+
+[node name="DashTrails" type="GPUParticles3D" parent="HexFrame/DashSphere" unique_id=92401812]
+transform = Transform3D(1, 6.7762636e-21, 0, -6.7762636e-21, 1, 0, -3.3881318e-20, 0, 1, 0, 0, 0)
+lifetime = 0.35000000000000003
+speed_scale = 2.0
+fixed_fps = 60
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_qek5x")
+draw_pass_1 = SubResource("BoxMesh_5gtgg")
+
 [node name="CameraPivot" type="Node3D" parent="." unique_id=181438624]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 0.99999994, 0, 0, 0, 0.99999994, 0, 4.845574, 0)
+visible = false
 
 [node name="SpringArm3D" type="SpringArm3D" parent="CameraPivot" unique_id=1979933887]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
@@ -1442,3 +1493,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)
 unique_name_in_owner = true
 wait_time = 0.055
 one_shot = true
+
+[node name="LockOnController" type="Node3D" parent="." unique_id=539825541]
+script = ExtResource("7_0owmy")
+rotation_smoothing = 25.0
+
+[node name="HealthComponent" type="Node3D" parent="." unique_id=484418875]
+script = ExtResource("8_qek5x")
